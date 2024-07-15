@@ -14,12 +14,20 @@ connection();
 app.use(express.json());
 app.use(cors());
 
-// Serve static files from the React app
-app.use(express.static(path.join(__dirname, 'public')));
+const buildPath = path.join(__dirname, '../client/build')
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+app.use(express.static(buildPath))
+
+app.get('/*', (req, res) => {
+  res.sendFile('index.html', { root : buildPath });
 });
+
+// Serve static files from the React app
+// app.use(express.static(path.join(__dirname, 'public')));
+
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(__dirname, 'public', 'index.html'));
+// });
 
 // API routes
 app.use("/api/users", userRoutes);
