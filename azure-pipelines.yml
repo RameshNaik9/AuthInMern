@@ -1,47 +1,58 @@
-# Node.js with React
-# Build a Node.js project that uses React.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
-
 trigger:
-- main
+  - main
 
 pool:
   vmImage: ubuntu-latest
 
 steps:
-- task: NodeTool@0
-  inputs:
-    versionSource: 'spec'
-    versionSpec: '18.x'
-    checkLatest: true
-  displayName: 'Install Node.js'
-- task: Npm@1
-  displayName: "Installing Modules in /client"
-  inputs:
-    command: 'install'
-    workingDir: 'client'
-- task: Npm@1
-  displayName: "Installing Modules in /server"
-  inputs:
-    command: 'install'
-    workingDir: 'server'
-- task: Npm@1
-  displayName: "Building Modules in /client"
-  inputs:
-    command: 'custom'
-    workingDir: 'client'
-    customCommand: 'run build'
+  - task: NodeTool@0
+    inputs:
+      versionSource: "spec"
+      versionSpec: "18.x"
+      checkLatest: true
+    displayName: "Install Node.js"
 
-- task: CopyFiles@2
-  inputs:
-    Contents: |
-      client/build/**
-      server/**
-    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+  # Install dependencies in the root folder
+  - task: Npm@1
+    displayName: "Installing Modules in Root"
+    inputs:
+      command: "install"
+      workingDir: "."
 
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'release'
-    publishLocation: 'Container'
+  # Install dependencies in the client folder
+  - task: Npm@1
+    displayName: "Installing Modules in /client"
+    inputs:
+      command: "install"
+      workingDir: "client"
+
+  # Install dependencies in the server folder
+  - task: Npm@1
+    displayName: "Installing Modules in /server"
+    inputs:
+      command: "install"
+      workingDir: "server"
+
+  # Build the client application
+  - task: Npm@1
+    displayName: "Building Modules in /client"
+    inputs:
+      command: "custom"
+      workingDir: "client"
+      customCommand: "run build"
+
+  - task: CopyFiles@2
+    inputs:
+      Contents: |
+        client/build/**
+        server/**
+      TargetFolder: "$(Build.ArtifactStagingDirectory)"
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: "$(Build.ArtifactStagingDirectory)"
+      ArtifactName: "release"
+      publishLocation: "Container"
+
+  - script: npm start
+    displayName: "Start MERN Application"
