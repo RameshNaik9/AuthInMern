@@ -1,22 +1,16 @@
-name: CI/CD Pipeline
+name: Deploy MERN Stack to Azure
 
 on:
   push:
     branches:
       - main
-      - develop
-      - stage/*
-      - release/*
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    services:
-      mongo:
-        image: mongo:4.4
-        ports:
-          - 27017:27017
 
     steps:
       - name: Checkout code
@@ -27,49 +21,98 @@ jobs:
         with:
           node-version: "14"
 
-      - name: Install frontend dependencies
+      - name: Install dependencies
         run: |
-          cd client
+          cd backend
+          npm install
+          cd ../frontend
           npm install
 
       - name: Build frontend
         run: |
-          cd client
+          cd frontend
           npm run build
-
-      - name: Install backend dependencies
-        run: |
-          cd server
-          npm install
-
-      - name: Copy frontend build to server
-        run: |
-          cp -r client/build server/client
-
-      - name: Archive build artifacts
-        run: |
-          tar -czf app-build.tar.gz -C server .
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: app-build
-          path: app-build.tar.gz
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Download build artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: app-build
-          path: ./app-build
+          cd ..
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: "AuthInMern" # Replace with your Azure Web App name
+          app-name: "AuthInMern"
+          slot-name: "production"
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: "./app-build/app-build.tar.gz"
+          package: "./"
+# name: CI/CD Pipeline
+
+# on:
+#   push:
+#     branches:
+#       - main
+#       - develop
+#       - stage/*
+#       - release/*
+
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+
+#     services:
+#       mongo:
+#         image: mongo:4.4
+#         ports:
+#           - 27017:27017
+
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v2
+
+#       - name: Set up Node.js
+#         uses: actions/setup-node@v2
+#         with:
+#           node-version: "14"
+
+#       - name: Install frontend dependencies
+#         run: |
+#           cd client
+#           npm install
+
+#       - name: Build frontend
+#         run: |
+#           cd client
+#           npm run build
+
+#       - name: Install backend dependencies
+#         run: |
+#           cd server
+#           npm install
+
+#       - name: Copy frontend build to server
+#         run: |
+#           cp -r client/build server/client
+
+#       - name: Archive build artifacts
+#         run: |
+#           tar -czf app-build.tar.gz -C server .
+
+#       - name: Upload build artifacts
+#         uses: actions/upload-artifact@v2
+#         with:
+#           name: app-build
+#           path: app-build.tar.gz
+
+#   deploy:
+#     needs: build
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Download build artifact
+#         uses: actions/download-artifact@v2
+#         with:
+#           name: app-build
+#           path: ./app-build
+
+#       - name: Deploy to Azure Web App
+#         uses: azure/webapps-deploy@v2
+#         with:
+#           app-name: "AuthInMern" # Replace with your Azure Web App name
+#           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+#           package: "./app-build/app-build.tar.gz"
