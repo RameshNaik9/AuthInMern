@@ -22,12 +22,12 @@ app.use(cors());
 //   res.sendFile(path.join(buildPath, "index.html"));
 // });
 
-const buildPath = path.join(__dirname, 'build');
+const buildPath = path.join(__dirname, '../client/build');
 
 app.use(express.static(buildPath));
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(buildPath, "index.html"));
+app.get("/*", (req, res) => {
+  res.sendFile('index.html',{ root : buildPath});
 });
 
 app.use("/api/users", userRoutes);
