@@ -33,7 +33,7 @@ steps:
   inputs:
     command: 'custom'
     workingDir: 'client'
-    customCommand: 'npm build'
+    customCommand: 'run build'
 - task: CopyFiles@2
   inputs:
     Contents: |
