@@ -14,10 +14,10 @@ const Login = () => {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		try {
-			const url = "https://authappdeploy.azurewebsites.net/api/auth";
+			const url = 'https://authappdeploy.azurewebsites.net/api/auth';
 			const { data: res } = await axios.post(url, data);
 			localStorage.setItem("token", res.data);
-			window.location = "/";
+			window.location = '/';
 		} catch (error) {
 			if (
 				error.response &&
@@ -62,7 +62,7 @@ const Login = () => {
 				<div className={styles.right}>
 					<h1>New Here ?</h1>
 					<h1>Hi</h1>
-					<Link to="/signup">
+					<Link to='/signup'>
 						<button type="button" className={styles.white_btn}>
 							Sing Up
 						</button>

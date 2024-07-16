@@ -26,12 +26,12 @@ const buildPath = path.join(__dirname, '../client/build');
 
 app.use(express.static(buildPath));
 
-app.get("/*", (req, res) => {
+app.get('/*', (req, res) => {
   res.sendFile('index.html',{ root : buildPath});
 });
 
-app.use("/api/users", userRoutes);
-app.use("/api/auth", authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/auth', authRoutes);
 
 const port = process.env.PORT || 8080;
 app.listen(port, () => {

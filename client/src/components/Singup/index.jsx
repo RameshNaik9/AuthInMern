@@ -20,9 +20,9 @@ const Signup = () => {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		try {
-			const url = "https://authappdeploy.azurewebsites.net/api/users";
+			const url = 'https://authappdeploy.azurewebsites.net/api/users';
 			const { data: res } = await axios.post(url, data);
-			navigate("/login");
+			navigate('/login');
 			console.log(res.message);
 		} catch (error) {
 			if (
@@ -40,7 +40,7 @@ const Signup = () => {
 			<div className={styles.signup_form_container}>
 				<div className={styles.left}>
 					<h1>Welcome Back</h1>
-					<Link to="/login">
+					<Link to='/login'>
 						<button type="button" className={styles.white_btn}>
 							Sing in
 						</button>
