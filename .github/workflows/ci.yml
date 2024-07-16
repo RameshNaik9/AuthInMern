@@ -34,6 +34,9 @@ jobs:
           npm run build
           cd ..
 
+      - name: List build folder contents
+        run: ls -R client/build
+
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
