@@ -39,7 +39,7 @@ steps:
     Contents: |
       client/build/**
       server/**
-    TargetFolder: 
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
