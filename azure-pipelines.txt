@@ -53,6 +53,3 @@ steps:
       PathtoPublish: "$(Build.ArtifactStagingDirectory)"
       ArtifactName: "release"
       publishLocation: "Container"
-
-  - script: npm start
-    displayName: "Start MERN Application"
