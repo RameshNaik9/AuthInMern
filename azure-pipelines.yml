@@ -1,0 +1,51 @@
+trigger:
+- main
+- develop
+- stage/*
+- release/*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  appName: 'AuthInMern'
+  resourceGroupName: 'MERNAppResourceGroup'
+  environmentName: 'Production'
+
+jobs:
+- job: DownloadAndDeploy
+  displayName: 'Download Artifacts and Deploy to Azure'
+  steps:
+  - task: DownloadPipelineArtifact@2
+    inputs:
+      artifactName: 'client-build'
+      targetPath: '$(Pipeline.Workspace)/client'
+
+  - task: DownloadPipelineArtifact@2
+    inputs:
+      artifactName: 'server-build'
+      targetPath: '$(Pipeline.Workspace)/server'
+
+  - task: ExtractFiles@1
+    inputs:
+      archiveFilePatterns: '$(Pipeline.Workspace)/client/client-build.tar.gz'
+      destinationFolder: '$(Pipeline.Workspace)/client-build'
+
+  - task: ExtractFiles@1
+    inputs:
+      archiveFilePatterns: '$(Pipeline.Workspace)/server/server-build.tar.gz'
+      destinationFolder: '$(Pipeline.Workspace)/server-build'
+
+  - task: AzureWebApp@1
+    inputs:
+      azureSubscription: 'AuthInMern-AzureServiceConnection'
+      appName: '$(appName)'
+      package: '$(Pipeline.Workspace)/client-build'
+      packageForLinux: '$(Pipeline.Workspace)/client-build'
+
+  - task: AzureWebApp@1
+    inputs:
+      azureSubscription: 'AuthInMern-AzureServiceConnection'
+      appName: '$(appName)'
+      package: '$(Pipeline.Workspace)/server-build'
+      packageForLinux: '$(Pipeline.Workspace)/server-build'
