@@ -1,51 +1,47 @@
+# Node.js with React
+# Build a Node.js project that uses React.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+
 trigger:
 - main
-- develop
-- stage/*
-- release/*
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: ubuntu-latest
 
-variables:
-  appName: 'AuthInMern'
-  resourceGroupName: 'MERNAppResourceGroup'
-  environmentName: 'Production'
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSource: 'spec'
+    versionSpec: '20.x'
+    checkLatest: true
+  displayName: 'Install Node.js'
+- task: Npm@1
+  displayName: "Installing Modules in /client"
+  inputs:
+    command: 'install'
+    workingDir: 'client'
 
-jobs:
-- job: DownloadAndDeploy
-  displayName: 'Download Artifacts and Deploy to Azure'
-  steps:
-  - task: DownloadPipelineArtifact@2
-    inputs:
-      artifactName: 'client-build'
-      targetPath: '$(Pipeline.Workspace)/client'
+- task: Npm@1
+  displayName: "Installing Modules in /server"
+  inputs:
+    command: 'install'
+    workingDir: 'server'
 
-  - task: DownloadPipelineArtifact@2
-    inputs:
-      artifactName: 'server-build'
-      targetPath: '$(Pipeline.Workspace)/server'
-
-  - task: ExtractFiles@1
-    inputs:
-      archiveFilePatterns: '$(Pipeline.Workspace)/client/client-build.tar.gz'
-      destinationFolder: '$(Pipeline.Workspace)/client-build'
-
-  - task: ExtractFiles@1
-    inputs:
-      archiveFilePatterns: '$(Pipeline.Workspace)/server/server-build.tar.gz'
-      destinationFolder: '$(Pipeline.Workspace)/server-build'
-
-  - task: AzureWebApp@1
-    inputs:
-      azureSubscription: 'AuthInMern-AzureServiceConnection'
-      appName: '$(appName)'
-      package: '$(Pipeline.Workspace)/client-build'
-      packageForLinux: '$(Pipeline.Workspace)/client-build'
-
-  - task: AzureWebApp@1
-    inputs:
-      azureSubscription: 'AuthInMern-AzureServiceConnection'
-      appName: '$(appName)'
-      package: '$(Pipeline.Workspace)/server-build'
-      packageForLinux: '$(Pipeline.Workspace)/server-build'
+- task: Npm@1
+  displayName: "Building Modules in /client"
+  inputs:
+    command: 'custom'
+    workingDir: 'client'
+    customCommand: 'npm build'
+- task: CopyFiles@2
+  inputs:
+    Contents: |
+      client/build/**
+      server/**
+    TargetFolder: 
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'release'
+    publishLocation: 'Container'
